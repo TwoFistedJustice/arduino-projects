@@ -18,6 +18,8 @@ void setup(){
 }
 void loop() {
     potVal = analogRead(potPin);
+    // change the values of the last 2 args to affect pitch
+    // reversing the order reverses the dial of the pot
     int pitch = map(potVal, potLow, potHigh, 50, 2000);
     Serial.print("potVal: ");
     Serial.print(potVal);
