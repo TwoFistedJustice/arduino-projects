@@ -1,4 +1,4 @@
-// Libarary must be installed via the IDE library manager under "sketch"
+// Library must be installed via the IDE library manager under "sketch"
 // I'm not sure what the capacitors are supposed to achieve in this project
 // the mechanism appears to work exactly the same with or without them
 // and even the read values do not change
