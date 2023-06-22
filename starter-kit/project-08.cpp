@@ -13,7 +13,6 @@ unsigned long previousTime = 0;
 int switchState = 0;
 int prevSwitchState = 0;
 int led = 2;
-int previousLed =0; // used to turn off led before next led comes on
 // set interval to 1 sec because 10 minutes per the book is wayyyy too long
 long interval = 333;
 void setup() {
@@ -32,9 +31,7 @@ void loop() {
     Serial.println(led);
     if( currentTime - previousTime > interval){  // if
         previousTime = currentTime;
-        digitalWrite(previousLed, LOW);
         digitalWrite(led, HIGH);
-        previousLed = led;
         led++;
         if( led > 7 ){
             Serial.println("RESET LED");
