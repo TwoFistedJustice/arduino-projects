@@ -6,7 +6,7 @@
  *  each LED is hooked up to a numbered pin on +
  *  all grounded together with the switch
  *
- *  This version causes the leds to blink sequentially and then repeat
+ *  This version causes the leds to blink sequentially and then repeatVV
  * */
 
 // BUG, the led number keeps incrementing, does not stop at 7
