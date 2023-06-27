@@ -1,136 +1,104 @@
-/* Project 8 from Arduino Starter Kit
- * Uses a tilt switch to control some LEDs
- *  everything in parallel
- * 6x LED + 6x R220
- * 1x Tilt Swtich + 1 R10k
- *  each LED is hooked up to a numbered pin on +
- *  all grounded together with the switch
- *
- *  This version causes the leds to blink sequentially from the middle toward the ends and then reverses
- * */
+/*
+* Project 8 from Arduino Starter Kit - MODIFIED
+* Uses a tilt switch to control some LEDs
+*  everything in parallel
+* 6x LED + 6x R220
+* 1x Tilt Swtich + 1 R10k
+*  each LED is hooked up to a numbered pin on +
+*  all grounded together with the switch
+*
+*  this version causes the lights to blink from the center
+*  to the outer edge and back on repeat
+* */
 
-// BUG, the inner leds activate twice each go round
-// It's lighting up 4,5 once going in and again going out causing it to stay on twice as long as the other lights.
+//arduino blinky lights
+//        blink from middle to ends and back
+
+
+
 #include <Arduino.h>
+// switch control
 const int switchPin = 8;
-unsigned long previousTime = 0;
-
 int switchState = 0;
 int prevSwitchState = 0;
 
-int innerLedA = 4;
-int innerLedB = 5;
+unsigned long previousTime = 0;
 
-int outerLedA = 2;
-int outerLedB = 7;
+// These are your control constants.
+// the number of leds between the middle and end of one side
+const int ledsPerSide = 3;
+// The two center leds. These are the first lights to activate
+const int innerLedA = 4;
+const int innerLedB = 5;
+// milliseconds before firing off the next action
+const long interval = 750;
 
-int ledA = innerLedA;
-int ledB = innerLedB;
+// the outermost leds
+const int outerLedA = innerLedA -  (ledsPerSide -1);
+const int outerLedB = innerLedB + (ledsPerSide -1);
 
-int previousLedA = 0; // used to turn off led before next led comes on
-int previousLedB = 0; // used to turn off led before next led comes on
-
-boolean outward = true;
-
-long interval = 750;
-
-/*
- *  BUG: the ends stays lit longer than the middle
- * */
+// leds will start one out of range then move into range on first run
+// these are passed as arguments to the actions
+int ledA = innerLedA + 1; // 4 3 2  - will start at 5
+int ledB = innerLedB - 1; // 5 6 7  - will start at 4
+boolean movingOutward = true;
 
 
-void messaging(){
-        Serial.print("Dark: ");
-        Serial.print(previousLedA);
-        Serial.print(", ");
-        Serial.println(previousLedB);
-        Serial.print("Lite: ");
-        Serial.print(ledA);
-        Serial.print(", ");
-        Serial.println(ledB);
+
+// pass in current led values
+void deactivate(int liteA, int liteB){
+    digitalWrite(liteA, LOW);
+    digitalWrite(liteB, LOW);
 }
 
-void resetOuters(){
-//    Serial.println("Resetting outers");
-    ledA = outerLedA;
-    ledB = outerLedB;
+void  activate(int liteA, int liteB){
+    digitalWrite(liteA, HIGH);
+    digitalWrite(liteB, HIGH);
 }
 
-
-
-void activateLeds(){
-//        messaging();
-        digitalWrite(previousLedA, LOW);
-        digitalWrite(previousLedB, LOW);
-
-        digitalWrite(ledA, HIGH);
-        digitalWrite(ledB, HIGH);
-
-        previousLedA = ledA;
-        previousLedB = ledB;
+// increments/Decrements led numbers
+void outward(){
+    ledA -= 1;
+    ledB += 1;
 }
 
-
-void blinkOutward(){
-    Serial.print("<-->: ");
-    Serial.print(ledA);
-    Serial.println(ledB);
-    activateLeds();
-    ledA--; // 3 2 | 1
-    ledB++; // 6 7 | 8 (reset occurs)
-
-    if( ledB > outerLedB ){
-//        Serial.print(ledB);
-//        Serial.println(" OUTERS");
-        outward = false;
-        resetOuters();
-    }
-}
-
-void blinkInward(){
-    Serial.print("-><-: ");
-    Serial.print(ledA);
-    Serial.println(ledB);
-    ledA++; // 3 4
-    ledB--; // 6 5
-    activateLeds();
-    if( ledB == innerLedB ){
-//        Serial.println("INNERS");
-        outward = true;
-    }
+void inward(){
+    ledA += 1;
+    ledB -= 1;
 }
 
 void setup() {
-    Serial.begin(9600);
-    for( int x = 2; x < 8; x++ ){
-        pinMode(x, OUTPUT);
+    for ( int i = 2; i < 8; i++){
+        pinMode(i, OUTPUT);
     }
     pinMode(switchPin, INPUT);
 }
+
 void loop() {
-    unsigned long currentTime = millis(); // millis() is a counter that doesn't stop execution and doesn't reset?
-
-    if( currentTime - previousTime > interval){  // if
+    unsigned long currentTime = millis();
+    if( currentTime - previousTime > interval) {
         previousTime = currentTime;
+        deactivate(ledA, ledB);
 
-        if (outward){
-            blinkOutward();
-        } else {
-            blinkInward();
+        if (ledA == outerLedA){
+            movingOutward = false;
+        } else if ( ledA == innerLedA){
+            movingOutward = true;
         }
+        if (movingOutward == true ){
+            outward();
+        } else {
+            inward();
+        }
+        activate(ledA, ledB);
     }
     switchState = digitalRead(switchPin);
-    if(switchState != prevSwitchState){
-        for(int x = 2; x < 8; x++){
-            digitalWrite(x, LOW);
+
+// restarts the sequence if you flip the switch
+    if (switchState != prevSwitchState){
+        for (int i = 2; i < 8; i++ ){
+            digitalWrite(i, LOW);
         }
-        ledA = innerLedA;
-        ledB = innerLedB;
-        previousTime = currentTime;
     }
     prevSwitchState = switchState;
 }
-
-
-
-
