@@ -1,6 +1,8 @@
 /*
 * Project 8 from Arduino Starter Kit - MODIFIED
 * Uses a tilt switch to control some LEDs
+* You can also just stick a wire in the breadboard and pull it out
+* when you want to reset the timer.
 *  everything in parallel
 * 6x LED + 6x R220
 * 1x Tilt Swtich + 1 R10k
