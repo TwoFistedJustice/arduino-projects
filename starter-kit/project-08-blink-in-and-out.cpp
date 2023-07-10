@@ -8,7 +8,8 @@
 *  all grounded together with the switch
 *
 *  this version causes the lights to blink from the center
-*  to the outer edge and back on repeat
+*  to the outer edge and back on repeat and solves the problem of the end leds lighting
+ *  up longer than the middle ones.
 * */
 
 //arduino blinky lights
@@ -78,18 +79,23 @@ void loop() {
     unsigned long currentTime = millis();
     if( currentTime - previousTime > interval) {
         previousTime = currentTime;
+        // start by turning off the leds
         deactivate(ledA, ledB);
 
+        // if the end leds are active, flip the boolean
         if (ledA == outerLedA){
             movingOutward = false;
         } else if ( ledA == innerLedA){
             movingOutward = true;
         }
+        // in/decrement the led #s in the appropriate order according to the boolean
         if (movingOutward == true ){
             outward();
         } else {
             inward();
         }
+
+        // turn on the selected leds
         activate(ledA, ledB);
     }
     switchState = digitalRead(switchPin);
