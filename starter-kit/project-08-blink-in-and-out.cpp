@@ -5,7 +5,11 @@
 * when you want to reset the timer.
 *  everything in parallel
 * 6x LED + 6x R220
-* 1x Tilt Swtich + 1 R10k
+*   Resistor for cathode (short leg to ground)
+ *  Pin to anode (long leg)
+*
+*  1x Switch + 1 R10k
+ *   Resistor between switch and ground
 *  each LED is hooked up to a numbered pin on +
 *  all grounded together with the switch
 *
